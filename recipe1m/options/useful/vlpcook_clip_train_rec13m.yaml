@@ -1,0 +1,126 @@
+__include__: abstract.yaml
+exp:
+    dir: /data/mshukor/logs/recipe1m/adamine_vit_recipe_h_transformer_with_titles_cross_dec_rec_avg_cat_cross_decoder_lr5_big_fix_moreep_all2img_incr_alpha_0_3
+dataset:
+    orig_ids_eval: true
+    freq_mismatch: 0.0
+    tokenized_raw_text: True
+    name: recipe1m_13m
+    batch_sampler: random
+    path_ids: /data/mshukor/data/recipe1m/recipe1m_13m/ids.json
+    vocab_path: /data/mshukor/data/recipe1m/text/vocab_all.txt
+    path_image_json: /data/mshukor/data/recipe1m/recipe1m_13m/layer2+.json
+    path_text_json: /data/mshukor/data/recipe1m/text/tokenized_layer1.json
+
+    use_vcs: True
+    kw_path:
+        train: /data/mshukor/data/recipe1m/clip_da/layer1_recipe1m_13m_train_ingr_kw.json
+        val: /data/mshukor/data/recipe1m/clip_da/layer1_val_ingr_kw.json
+        test: /data/mshukor/data/recipe1m/clip_da/layer1_test_ingr_kw.json
+    randkw_p: 0.3
+ 
+    aux_kw_path:
+        train: /data/mshukor/data/recipe1m/clip_da/layer1_recipe1m_13m_train_titles_kw.json
+        val: /data/mshukor/data/recipe1m/clip_da/layer1_val_titles_kw.json
+        test: /data/mshukor/data/recipe1m/clip_da/layer1_test_titles_kw.json
+    randkw_p_aux: 0.5
+
+model: 
+    with_classif: False
+    network:
+        keep_embedding: True
+        text_encoder: 'bert-base-uncased'
+        vision_width: 768
+        bert_config: ../models/network/recipe_networks/config_bert.json
+        image_res: 224
+        num_hidden_layers_kw: 2
+        aux_kwords: True
+        kwords_same_level: False
+        cat_pos: 0
+        last_cat_aux: True
+        aux_kwords_encoder: True
+
+        image_backbone_name: clip
+        recipe_encoder: vlpcook-transformer
+        n_heads: 4
+        n_layers: 2
+        n_layers_single: 2
+        n_heads_single: 4
+        old: True
+        path_vocab: /data/mshukor/data/recipe1m/text/vocab_all.txt
+        hidden_size: 512
+        with_titles: True
+
+        cross_transformer: False
+        cross_decoder_recipe: True
+        avg_concat: True
+        n_layers_cross: 2
+        n_heads_cross: 4
+        get_tokens_cross_decoder_recipe: True
+
+        cross_decoder_image: True
+        n_heads_cross_image: 4
+        n_layers_cross_image: 1
+
+        class_attention: False
+        cls_token: False
+        class_attention_fus: False
+        cls_token_fus: False
+        get_tokens: True
+        freeze_rec: False 
+        freeze_im: False
+        vit_all_tokens: True
+        cross_encoder: True
+        cross_encoder_params:
+            cross_decoder: True
+            query_img: False
+            double_decoder: False
+            cross_attention: False
+            n_heads: 4
+            n_layers: 4    
+            class_attention: False
+            cls_token: False
+            get_tokens: False
+            load_backbones: False
+    criterion:
+        name: trijoint
+        keep_background: False
+        retrieval_strategy:
+            name: vlp_triplet # quadruplet, triplet, pairwise, or pairwise_pytorch, vlp_triplet
+            margin: 0.05
+            margin_params:
+                increment_margin: True
+                increment: 0.005
+                max_margin: 0.3
+            sampling: max_negative # random (outdated), max_negative, or prob_negative
+            nb_samples: 9999
+            aggregation: valid # mean, valid (adamine)
+            substrategy:
+                - IRR
+                - RII
+            substrategy_weights:
+                - 1.0
+                - 1.0
+            get_tokens: True
+
+        cross_encoder: True
+        itm_loss_weight: 1
+        cross_encoder_params:
+            tri_cross_encoder: False
+    metric:
+        k_test: 10
+        trijoint: True
+misc:
+    cuda: True
+    seed: 1338
+    logs_name:
+    overrite: False
+    data_parrallel: False
+
+optimizer:
+    lr: 0.00001
+    lr_img: 0.000001
+    switch_epoch: 5
+
+engine:
+    nb_epochs: 60
