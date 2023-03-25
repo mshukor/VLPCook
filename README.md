@@ -324,8 +324,12 @@ By default, the model is evaluated on the 1k setup, to evaluate on the 10k setup
 ## Citation
 
 ```
-
-
+@article{shukor2022structured,
+  title={Structured Vision-Language Pretraining for Computational Cooking},
+  author={Shukor, Mustafa and Thome, Nicolas and Cord, Matthieu},
+  journal={arXiv preprint arXiv:2212.04267},
+  year={2022}
+}
 ```
 ## Acknowledgment
 
